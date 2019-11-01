@@ -56,13 +56,15 @@ $t->loadDomain('messages', 'project/Locale');
 echo $t->gettext('apple');
 ```
 
-## Global functions
+## Translator functions
 
 To ease the use of translations in your php templates, you can use the provided functions:
 
 ```php
+use Gettext\TranslatorFunctions;
+
 //Register the translator to use the global functions
-$t->register();
+TranslatorFunctions::register($t);
 
 echo __('apple'); // it's the same than $t->gettext('apple');
 ```

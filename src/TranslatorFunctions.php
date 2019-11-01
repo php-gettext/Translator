@@ -5,7 +5,7 @@ namespace Gettext;
 
 use RuntimeException;
 
-abstract class GlobalTranslator
+abstract class TranslatorFunctions
 {
     private static $translator;
 
@@ -18,7 +18,7 @@ abstract class GlobalTranslator
         return $previous;
     }
 
-    public static function get(): TranslatorInterface
+    public static function registered(): TranslatorInterface
     {
         $translator = self::$translator;
 

@@ -4,12 +4,27 @@ declare(strict_types = 1);
 namespace Gettext;
 
 use InvalidArgumentException;
+use Gettext\Generator\ArrayGenerator;
 
 class Translator implements TranslatorInterface
 {
     protected $domain;
     protected $dictionary = [];
     protected $plurals = [];
+
+    public static function createFromTranslations(Translations ...$allTranslations): Translator
+    {
+        $translator = new static();
+        $arrayGenerator = new ArrayGenerator();
+
+        foreach ($allTranslations as $translations) {
+            $translator->addTranslations(
+                $arrayGenerator->generateArray($translations)
+            );
+        }
+
+        return $translator;
+    }
 
     /**
      * Load new translations from php files
@@ -80,35 +95,45 @@ class Translator implements TranslatorInterface
 
     public function gettext(string $original): string
     {
-        return $this->dpgettext($this->domain, null, $original);
+        return $this->translate(null, null, $original);
     }
 
     public function ngettext(string $original, string $plural, int $value): string
     {
-        return $this->dnpgettext($this->domain, null, $original, $plural, $value);
+        return $this->translatePlural(null, null, $original, $plural, $value);
     }
 
     public function dngettext(string $domain, string $original, string $plural, int $value): string
     {
-        return $this->dnpgettext($domain, null, $original, $plural, $value);
+        return $this->translatePlural($domain, null, $original, $plural, $value);
     }
 
     public function npgettext(string $context, string $original, string $plural, int $value): string
     {
-        return $this->dnpgettext($this->domain, $context, $original, $plural, $value);
+        return $this->translatePlural(null, $context, $original, $plural, $value);
     }
 
     public function pgettext(string $context, string $original): string
     {
-        return $this->dpgettext($this->domain, $context, $original);
+        return $this->translate(null, $context, $original);
     }
 
     public function dgettext(string $domain, string $original): string
     {
-        return $this->dpgettext($domain, null, $original);
+        return $this->translate($domain, null, $original);
     }
 
     public function dpgettext(string $domain, string $context, string $original): string
+    {
+        return $this->translate($domain, $context, $original);
+    }
+
+    public function dnpgettext(string $domain, string $context, string $original, string $plural, int $value): string
+    {
+        return $this->translatePlural($domain, $context, $original, $plural, $value);
+    }
+
+    protected function translate(?string $domain, ?string $context, string $original): string
     {
         $translation = $this->getTranslation($domain, $context, $original);
 
@@ -119,8 +144,13 @@ class Translator implements TranslatorInterface
         return $original;
     }
 
-    public function dnpgettext(string $domain, string $context, string $original, string $plural, int $value): string
-    {
+    protected function translatePlural(
+        ?string $domain,
+        ?string $context,
+        string $original,
+        string $plural,
+        int $value
+    ): string {
         $translation = $this->getTranslation($domain, $context, $original);
         $key = $this->getPluralIndex($domain, $value, $translation === null);
 
@@ -134,17 +164,31 @@ class Translator implements TranslatorInterface
     /**
      * Search and returns a translation.
      */
-    protected function getTranslation(string $domain, string $context, string $original): ?string
+    protected function getTranslation(?string $domain, ?string $context, string $original): ?array
     {
-        return $this->dictionary[$domain][$context][$original] ?? null;
+        if ($domain === null) {
+            $domain = $this->domain;
+        }
+
+        if ($context === null) {
+            $context = '';
+        }
+
+        $translation = $this->dictionary[$domain][$context][$original] ?? null;
+
+        return $translation === null ? $translation : (array) $translation;
     }
 
     /**
      * Executes the plural decision code given the number to decide which
      * plural version to take.
      */
-    protected function getPluralIndex(string $domain, int $n, bool $fallback): int
+    protected function getPluralIndex(?string $domain, int $n, bool $fallback): int
     {
+        if ($domain === null) {
+            $domain = $this->domain;
+        }
+
         //Not loaded domain or translation, use a fallback
         if (!isset($this->plurals[$domain]) || $fallback === true) {
             return $n == 1 ? 0 : 1;

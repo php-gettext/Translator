@@ -1,13 +1,13 @@
 <?php
 
-use Gettext\GlobalTranslator as Translator;
+use Gettext\TranslatorFunctions as Translator;
 
 /**
  * Returns the translation of a string.
  */
 function __(string $original, ...$args): string
 {
-    $text = Translator::get()->gettext($original);
+    $text = Translator::registered()->gettext($original);
 
     return Translator::format($text, $args);
 }
@@ -25,7 +25,7 @@ function noop__(string $original): string
  */
 function n__(string $original, string $plural, int $value, ...$args)
 {
-    $text = Translator::get()->ngettext($original, $plural, $value);
+    $text = Translator::registered()->ngettext($original, $plural, $value);
 
     return Translator::format($text, $args);
 }
@@ -35,7 +35,7 @@ function n__(string $original, string $plural, int $value, ...$args)
  */
 function p__(string $context, string $original, ...$args): string
 {
-    $text = Translator::get()->pgettext($context, $original);
+    $text = Translator::registered()->pgettext($context, $original);
 
     return Translator::format($text, $args);
 }
@@ -45,7 +45,7 @@ function p__(string $context, string $original, ...$args): string
  */
 function d__(string $domain, string $original, ...$args): string
 {
-    $text = Translator::get()->dgettext($domain, $original);
+    $text = Translator::registered()->dgettext($domain, $original);
 
     return Translator::format($text, $args);
 }
@@ -55,7 +55,7 @@ function d__(string $domain, string $original, ...$args): string
  */
 function dp__(string $domain, string $context, string $original, ...$args): string
 {
-    $text = Translator::get()->dpgettext($domain, $context, $original);
+    $text = Translator::registered()->dpgettext($domain, $context, $original);
 
     return Translator::format($text, $args);
 }
@@ -65,7 +65,7 @@ function dp__(string $domain, string $context, string $original, ...$args): stri
  */
 function dn__(string $domain, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::get()->dngettext($domain, $original, $plural, $value);
+    $text = Translator::registered()->dngettext($domain, $original, $plural, $value);
 
     return Translator::format($text, $args);
 }
@@ -75,7 +75,7 @@ function dn__(string $domain, string $original, string $plural, int $value, ...$
  */
 function np__(string $context, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::get()->npgettext($context, $original, $plural, $value);
+    $text = Translator::registered()->npgettext($context, $original, $plural, $value);
 
     return Translator::format($text, $args);
 }
@@ -85,7 +85,7 @@ function np__(string $context, string $original, string $plural, int $value, ...
  */
 function dnp__(string $domain, string $context, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::get()->dnpgettext($domain, $context, $original, $plural, $value);
+    $text = Translator::registered()->dnpgettext($domain, $context, $original, $plural, $value);
 
     return Translator::format($text, $args);
 }
