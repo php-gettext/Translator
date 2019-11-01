@@ -34,7 +34,7 @@ abstract class TranslatorFunctions
         if (empty($args)) {
             return $text;
         }
-    
+
         return is_array($args[0]) ? strtr($text, $args[0]) : vsprintf($text, $args);
     }
 }

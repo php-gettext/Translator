@@ -3,10 +3,9 @@ declare(strict_types = 1);
 
 namespace Gettext\Loader;
 
-use Gettext\Translations;
-use Gettext\Translation;
-use Gettext\Headers;
 use BadMethodCallException;
+use Gettext\Headers;
+use Gettext\Translations;
 
 /**
  * Class to load a array file
@@ -29,7 +28,7 @@ final class ArrayLoader extends Loader
 
     private static function includeSafe($filename): array
     {
-        return include($filename);
+        return include $filename;
     }
 
     public function loadArray(array $array, Translations $translations = null): Translations

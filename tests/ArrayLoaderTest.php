@@ -2,8 +2,6 @@
 
 namespace Gettext\Tests;
 
-use Gettext\Translation;
-use Gettext\Translations;
 use Gettext\Loader\ArrayLoader;
 use PHPUnit\Framework\TestCase;
 
@@ -46,13 +44,13 @@ X-Generator: Poedit 1.6.5',
                 ],
                 'other-context' => [
                     'Multibyte test' => ['日本人は日本で話される言語です！'],
-                    'Tabulation test' => ['FIELD	FIELD']
+                    'Tabulation test' => ['FIELD	FIELD'],
                 ],
             ],
         ];
 
         $translations = $loader->loadArray($array);
-        
+
         $this->assertCount(13, $translations->getHeaders());
         $this->assertSame('1.0', $translations->getHeaders()->get('MIME-Version'));
         $this->assertCount(13, $translations);

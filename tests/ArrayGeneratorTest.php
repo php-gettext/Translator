@@ -2,9 +2,9 @@
 
 namespace Gettext\Tests;
 
+use Gettext\Generator\ArrayGenerator;
 use Gettext\Translation;
 use Gettext\Translations;
-use Gettext\Generator\ArrayGenerator;
 use PHPUnit\Framework\TestCase;
 
 class ArrayGeneratorTest extends TestCase
@@ -35,7 +35,6 @@ class ArrayGeneratorTest extends TestCase
         $translation->translatePlural('plural1', 'plural2', 'plural3');
         $translations->add($translation);
 
-
         $generator = new ArrayGenerator();
         $array = $generator->generateArray($translations);
 
@@ -63,7 +62,7 @@ X-Domain: testingdomain',
                 ],
             ],
         ];
-        
+
         $this->assertSame($expected, $array);
     }
 }

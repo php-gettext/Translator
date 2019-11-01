@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 namespace Gettext;
 
-use InvalidArgumentException;
 use Gettext\Generator\ArrayGenerator;
+use InvalidArgumentException;
 
 class Translator implements TranslatorInterface
 {

@@ -3,9 +3,9 @@ declare(strict_types = 1);
 
 namespace Gettext\Generator;
 
-use Gettext\Translations;
-use Gettext\Translation;
 use Gettext\Headers;
+use Gettext\Translation;
+use Gettext\Translations;
 
 final class ArrayGenerator extends Generator
 {
@@ -33,7 +33,7 @@ final class ArrayGenerator extends Generator
             $headers = [];
 
             foreach ($translations->getHeaders() as $name => $value) {
-                $headers[] = sprintf("%s: %s", $name, $value);
+                $headers[] = sprintf('%s: %s', $name, $value);
             }
 
             $messages[''] = ['' => implode("\n", $headers)];

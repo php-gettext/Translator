@@ -6,7 +6,6 @@ use Gettext\Translation;
 use Gettext\Translations;
 use Gettext\Translator;
 use Gettext\TranslatorFunctions;
-use Gettext\Generator\ArrayGenerator;
 use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
@@ -34,17 +33,17 @@ class FunctionsTest extends TestCase
         $translations = Translations::create()
             ->add(Translation::create('daytime', 'Hello %s')->translate('Bonjour %s'))
             ->add(Translation::create('nightime', 'Hello %s')->translate('Bonsoir %s'));
-        
+
         $t = Translator::createFromTranslations($translations);
         TranslatorFunctions::register($t);
 
-        $this->assertEquals('Bonjour %s', p__('daytime','Hello %s'));
-        $this->assertEquals('Bonjour John', p__('daytime','Hello %s', 'John'));
-        $this->assertEquals('Bonjour 0', p__('daytime','Hello %s', 0));
-        $this->assertEquals('Bonjour ', p__('daytime','Hello %s', null));
-        $this->assertEquals('Bonjour John', p__('daytime','Hello %s',['%s' => 'John']));
-        $this->assertEquals('Bonsoir John', p__('nightime','Hello %s', 'John'));
-        $this->assertEquals('Bonsoir John', p__('nightime','Hello %s',['%s' => 'John']));
+        $this->assertEquals('Bonjour %s', p__('daytime', 'Hello %s'));
+        $this->assertEquals('Bonjour John', p__('daytime', 'Hello %s', 'John'));
+        $this->assertEquals('Bonjour 0', p__('daytime', 'Hello %s', 0));
+        $this->assertEquals('Bonjour ', p__('daytime', 'Hello %s', null));
+        $this->assertEquals('Bonjour John', p__('daytime', 'Hello %s', ['%s' => 'John']));
+        $this->assertEquals('Bonsoir John', p__('nightime', 'Hello %s', 'John'));
+        $this->assertEquals('Bonsoir John', p__('nightime', 'Hello %s', ['%s' => 'John']));
     }
 
     public function testDomainFunction()
@@ -55,13 +54,13 @@ class FunctionsTest extends TestCase
         $t = Translator::createFromTranslations($translations);
         TranslatorFunctions::register($t);
 
-        $this->assertEquals('Bonjour %s', d__('messages','Hello %s'));
-        $this->assertEquals('Bonjour John', d__('messages','Hello %s','John'));
-        $this->assertEquals('Bonjour 0', d__('messages','Hello %s',0));
-        $this->assertEquals('Bonjour ', d__('messages','Hello %s',null));
-        $this->assertEquals('Bonjour John', d__('messages','Hello %s',['%s' => 'John']));
-        $this->assertEquals('Hello %s', d__('errors','Hello %s'));
-        $this->assertEquals('Hello John', d__('errors','Hello %s',['%s' => 'John']));
+        $this->assertEquals('Bonjour %s', d__('messages', 'Hello %s'));
+        $this->assertEquals('Bonjour John', d__('messages', 'Hello %s', 'John'));
+        $this->assertEquals('Bonjour 0', d__('messages', 'Hello %s', 0));
+        $this->assertEquals('Bonjour ', d__('messages', 'Hello %s', null));
+        $this->assertEquals('Bonjour John', d__('messages', 'Hello %s', ['%s' => 'John']));
+        $this->assertEquals('Hello %s', d__('errors', 'Hello %s'));
+        $this->assertEquals('Hello John', d__('errors', 'Hello %s', ['%s' => 'John']));
     }
 
     public function testDomainPluralFunction()
@@ -89,18 +88,18 @@ class FunctionsTest extends TestCase
         $translations = Translations::create('messages')
             ->add(Translation::create('daytime', 'Hello %s')->translate('Bonjour %s'))
             ->add(Translation::create('nightime', 'Hello %s')->translate('Bonsoir %s'));
-        
+
         $t = Translator::createFromTranslations($translations);
         TranslatorFunctions::register($t);
 
-        $this->assertEquals('Bonjour %s', dp__('messages','daytime','Hello %s'));
-        $this->assertEquals('Bonjour John', dp__('messages','daytime','Hello %s', 'John'));
-        $this->assertEquals('Bonjour 0', dp__('messages','daytime','Hello %s', 0));
-        $this->assertEquals('Bonjour ', dp__('messages','daytime','Hello %s', null));
-        $this->assertEquals('Bonjour John', dp__('messages','daytime','Hello %s',['%s' => 'John']));
-        $this->assertEquals('Bonsoir John', dp__('messages','nightime','Hello %s', 'John'));
-        $this->assertEquals('Bonsoir John', dp__('messages','nightime','Hello %s',['%s' => 'John']));
-        $this->assertEquals('Hello John', dp__('errors','daytime','Hello %s',['%s' => 'John']));
+        $this->assertEquals('Bonjour %s', dp__('messages', 'daytime', 'Hello %s'));
+        $this->assertEquals('Bonjour John', dp__('messages', 'daytime', 'Hello %s', 'John'));
+        $this->assertEquals('Bonjour 0', dp__('messages', 'daytime', 'Hello %s', 0));
+        $this->assertEquals('Bonjour ', dp__('messages', 'daytime', 'Hello %s', null));
+        $this->assertEquals('Bonjour John', dp__('messages', 'daytime', 'Hello %s', ['%s' => 'John']));
+        $this->assertEquals('Bonsoir John', dp__('messages', 'nightime', 'Hello %s', 'John'));
+        $this->assertEquals('Bonsoir John', dp__('messages', 'nightime', 'Hello %s', ['%s' => 'John']));
+        $this->assertEquals('Hello John', dp__('errors', 'daytime', 'Hello %s', ['%s' => 'John']));
     }
 
     public function testPluralAndContextFunction()
@@ -121,6 +120,7 @@ class FunctionsTest extends TestCase
         $this->assertEquals('beaucoup de commentaires', np__('comment', 'One comment', '%s comments', 3, ['%s' => 'beaucoup de']));
         $this->assertEquals('3 comments', np__('', 'One comment', '%s comments', 3, ['%s' => 3]));
     }
+
     public function testPluralAndContextAndDomainFunction()
     {
         $translations = Translations::create('messages')->add(
@@ -128,7 +128,7 @@ class FunctionsTest extends TestCase
                 ->translate('Un commentaire')
                 ->translatePlural('%s commentaires')
         );
-        
+
         $t = Translator::createFromTranslations($translations);
         TranslatorFunctions::register($t);
 
@@ -140,6 +140,7 @@ class FunctionsTest extends TestCase
         $this->assertEquals('beaucoup de comments', dnp__('errors', 'comment', 'One comment', '%s comments', 3, ['%s' => 'beaucoup de']));
         $this->assertEquals('beaucoup de comments', dnp__('messages', '', 'One comment', '%s comments', 3, ['%s' => 'beaucoup de']));
     }
+
     public function testNonLoadedTranslations()
     {
         $t = new Translator();
