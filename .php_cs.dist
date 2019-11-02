@@ -7,4 +7,5 @@ return My\PhpCsFixerConfig::create()
             ->name('*.php')
             ->in(__DIR__.'/src')
             ->in(__DIR__.'/tests')
+            ->exclude('assets')
     );

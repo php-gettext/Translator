@@ -12,8 +12,6 @@ use Gettext\Translations;
  */
 final class ArrayLoader extends Loader
 {
-    use HeadersLoaderTrait;
-
     public function loadFile(string $filename, Translations $translations = null): Translations
     {
         $array = self::includeSafe($filename);
@@ -45,14 +43,7 @@ final class ArrayLoader extends Loader
             }
 
             foreach ($contextTranslations as $original => $value) {
-                //Headers
-                if ($context === null && $original === '') {
-                    $string = is_array($value) ? array_shift($value) : $value;
-                    $headers = $translations->getHeaders();
-
-                    foreach (self::parseHeaders($string) as $name => $value) {
-                        $headers->set($name, $value);
-                    }
+                if ($original === '') {
                     continue;
                 }
 

@@ -9,15 +9,6 @@ use Gettext\Translations;
 
 final class ArrayGenerator extends Generator
 {
-    private $includeHeaders = false;
-
-    public function includeHeaders(bool $includeHeaders = true): self
-    {
-        $this->includeHeaders = $includeHeaders;
-
-        return $this;
-    }
-
     public function generateString(Translations $translations): string
     {
         $array = $this->generateArray($translations);
@@ -31,18 +22,8 @@ final class ArrayGenerator extends Generator
         $pluralSize = is_array($pluralForm) ? ($pluralForm[0] - 1) : null;
         $messages = [];
 
-        if ($this->includeHeaders) {
-            $headers = [];
-
-            foreach ($translations->getHeaders() as $name => $value) {
-                $headers[] = sprintf('%s: %s', $name, $value);
-            }
-
-            $messages[''] = ['' => implode("\n", $headers)];
-        }
-
         foreach ($translations as $translation) {
-            if ($translation->isDisabled()) {
+            if (!$translation->getTranslation() || $translation->isDisabled()) {
                 continue;
             }
 
