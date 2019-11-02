@@ -35,7 +35,7 @@ class ArrayGeneratorTest extends TestCase
         $translation->translatePlural('plural1', 'plural2', 'plural3');
         $translations->add($translation);
 
-        $generator = new ArrayGenerator();
+        $generator = (new ArrayGenerator())->includeHeaders();
         $array = $generator->generateArray($translations);
 
         $expected = [
