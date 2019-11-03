@@ -7,9 +7,8 @@ use Gettext\TranslatorFunctions as Translator;
  */
 function __(string $original, ...$args): string
 {
-    $text = Translator::registered()->gettext($original);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->gettext($original);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -25,9 +24,8 @@ function noop__(string $original): string
  */
 function n__(string $original, string $plural, int $value, ...$args)
 {
-    $text = Translator::registered()->ngettext($original, $plural, $value);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->ngettext($original, $plural, $value);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -35,9 +33,8 @@ function n__(string $original, string $plural, int $value, ...$args)
  */
 function p__(string $context, string $original, ...$args): string
 {
-    $text = Translator::registered()->pgettext($context, $original);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->pgettext($context, $original);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -45,9 +42,8 @@ function p__(string $context, string $original, ...$args): string
  */
 function d__(string $domain, string $original, ...$args): string
 {
-    $text = Translator::registered()->dgettext($domain, $original);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->dgettext($domain, $original);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -55,9 +51,8 @@ function d__(string $domain, string $original, ...$args): string
  */
 function dp__(string $domain, string $context, string $original, ...$args): string
 {
-    $text = Translator::registered()->dpgettext($domain, $context, $original);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->dpgettext($domain, $context, $original);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -65,9 +60,8 @@ function dp__(string $domain, string $context, string $original, ...$args): stri
  */
 function dn__(string $domain, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::registered()->dngettext($domain, $original, $plural, $value);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->dngettext($domain, $original, $plural, $value);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -75,9 +69,8 @@ function dn__(string $domain, string $original, string $plural, int $value, ...$
  */
 function np__(string $context, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::registered()->npgettext($context, $original, $plural, $value);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->npgettext($context, $original, $plural, $value);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
@@ -85,7 +78,6 @@ function np__(string $context, string $original, string $plural, int $value, ...
  */
 function dnp__(string $domain, string $context, string $original, string $plural, int $value, ...$args): string
 {
-    $text = Translator::registered()->dnpgettext($domain, $context, $original, $plural, $value);
-
-    return Translator::format($text, $args);
+    $text = Translator::getTranslator()->dnpgettext($domain, $context, $original, $plural, $value);
+    return Translator::getFormatter()->format($text, $args);
 }

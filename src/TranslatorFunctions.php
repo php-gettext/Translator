@@ -8,33 +8,27 @@ use RuntimeException;
 abstract class TranslatorFunctions
 {
     private static $translator;
+    private static $formatter;
 
-    public static function register(TranslatorInterface $translator): ?TranslatorInterface
+    public static function register(TranslatorInterface $translator, FormatterInterface $formatter = null): ?TranslatorInterface
     {
-        $previous = self::$translator;
+        $previous = [self::$translator, self::$formatter];
+
         self::$translator = $translator;
+        self::$formatter = $formatter ?: new Formatter();
+
         include_once __DIR__.'/functions.php';
 
         return $previous;
     }
 
-    public static function registered(): TranslatorInterface
+    public static function getTranslator(): TranslatorInterface
     {
-        $translator = self::$translator;
-
-        if (!$translator) {
-            throw new RuntimeException('No translator registered');
-        }
-
-        return $translator;
+        return self::$translator;
     }
 
-    public static function format(string $text, array $args): string
+    public static function getFormatter(): FormatterInterface
     {
-        if (empty($args)) {
-            return $text;
-        }
-
-        return is_array($args[0]) ? strtr($text, $args[0]) : vsprintf($text, $args);
+        return self::$formatter;
     }
 }
