@@ -27,6 +27,9 @@
         "oscarotero/php-cs-fixer-config": "^1.0",
         "friendsofphp/php-cs-fixer": "^2.15"
     },
+    "suggest": {
+        "gettext/gettext": "Is necessary to load and generate array files used by the translator"
+    },
     "autoload": {
         "psr-4": {
             "Gettext\\": "src"
