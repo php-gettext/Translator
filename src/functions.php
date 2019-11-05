@@ -14,15 +14,16 @@ function __(string $original, ...$args): string
 /**
  * Noop, marks the string for translation but returns it unchanged.
  */
-function noop__(string $original): string
+function noop__(string $original, ...$args): string
 {
-    return $original;
+    $text = Translator::getTranslator()->noop($original);
+    return Translator::getFormatter()->format($text, $args);
 }
 
 /**
  * Returns the singular/plural translation of a string.
  */
-function n__(string $original, string $plural, int $value, ...$args)
+function n__(string $original, string $plural, int $value, ...$args): string
 {
     $text = Translator::getTranslator()->ngettext($original, $plural, $value);
     return Translator::getFormatter()->format($text, $args);
