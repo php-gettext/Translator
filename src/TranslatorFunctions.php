@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Gettext;
 
-use RuntimeException;
-
 abstract class TranslatorFunctions
 {
     private static $translator;
