@@ -9,6 +9,19 @@ use Gettext\Translations;
 
 final class ArrayGenerator extends Generator
 {
+    private $includeEmpty;
+
+    /**
+     * Constructs a new ArrayGenerator
+     * @param array|null $options
+     *
+     * bool includeEmpty Controls whether empty translations should be included (default: false)
+     */
+    public function __construct(?array $options = null)
+    {
+        $this->includeEmpty = (bool) ($options['includeEmpty'] ?? false);
+    }
+
     public function generateString(Translations $translations): string
     {
         $array = $this->generateArray($translations);
@@ -23,7 +36,7 @@ final class ArrayGenerator extends Generator
         $messages = [];
 
         foreach ($translations as $translation) {
-            if (!$translation->getTranslation() || $translation->isDisabled()) {
+            if ((!$this->includeEmpty && !$translation->getTranslation()) || $translation->isDisabled()) {
                 continue;
             }
 
