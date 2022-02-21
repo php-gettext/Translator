@@ -43,4 +43,32 @@ class ArrayGeneratorTest extends TestCase
 
         $this->assertSame($expected, $array);
     }
+
+    public function testArrayGeneratorWithEmptyTranslations()
+    {
+        $translations = Translations::create('testingdomain');
+        $translations->setLanguage('en');
+
+        $translation = Translation::create(null, 'Empty translation included');
+        $translation->translate('');
+        $translations->add($translation);
+
+        $translation = Translation::create(null, 'Inexistent translation included');
+        $translations->add($translation);
+
+        $array = (new ArrayGenerator(['includeEmpty' => true]))->generateArray($translations);
+
+        $expected = [
+            'domain' => 'testingdomain',
+            'plural-forms' => 'nplurals=2; plural=n != 1;',
+            'messages' => [
+                '' => [
+                    'Empty translation included' => '',
+                    'Inexistent translation included' => null,
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $array);
+    }
 }
