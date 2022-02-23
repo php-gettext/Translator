@@ -69,7 +69,7 @@ class Translator implements TranslatorInterface
             // Slap on a return keyword and semicolon at the end.
             $this->plurals[$domain] = [
                 'count' => (int) str_replace('nplurals=', '', $count),
-                'code' => str_replace('plural=', 'return ', str_replace('n', '$n', $code)).';',
+                'code' => 'return ' . static::fixTerseIfs(rtrim(str_replace('plural=', '', $code), ';')) . ';',
             ];
         }
 
@@ -195,7 +195,7 @@ class Translator implements TranslatorInterface
         }
 
         if (!isset($this->plurals[$domain]['function'])) {
-            $code = self::fixTerseIfs($this->plurals[$domain]['code']);
+            $code = $this->plurals[$domain]['code'];
             $this->plurals[$domain]['function'] = eval("return function (\$n) { $code };");
         }
 
@@ -207,45 +207,25 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * This function will recursively wrap failure states in brackets if they contain a nested terse if.
+     * This function prepares the gettext plural form expression to be evaluated by PHP
      *
-     * This because PHP can not handle nested terse if's unless they are wrapped in brackets.
+     * Nested ternary IFs will be enclosed by parenthesis and the variable "n" will be prefixed by "$".
      *
-     * This code probably only works for the gettext plural decision codes.
-     *
-     * return ($n==1 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2);
+     * $n==1 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2
      * becomes
-     * return ($n==1 ? 0 : ($n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2));
+     * $n==1 ? 0 : ($n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2)
      */
-    private static function fixTerseIfs(string $code, bool $inner = false): string
+    private static function fixTerseIfs(string $pluralForms): string
     {
-        /*
-         * (?P<expression>[^?]+)   Capture everything up to ? as 'expression'
-         * \?                      ?
-         * (?P<success>[^:]+)      Capture everything up to : as 'success'
-         * :                       :
-         * (?P<failure>[^;]+)      Capture everything up to ; as 'failure'
-         */
-        preg_match('/(?P<expression>[^?]+)\?(?P<success>[^:]+):(?P<failure>[^;]+)/', $code, $matches);
-
-        // If no match was found then no terse if was present
-        if (!isset($matches[0])) {
-            return $code;
+        if (preg_match('/[^<>|%&!?:=n()\d\s]/', $pluralForms)) {
+            throw new InvalidArgumentException('Invalid plural form expression');
         }
-
-        $expression = $matches['expression'];
-        $success = $matches['success'];
-        $failure = $matches['failure'];
-
-        // Go look for another terse if in the failure state.
-        $failure = static::fixTerseIfs($failure, true);
-        $code = $expression.' ? '.$success.' : '.$failure;
-
-        if ($inner) {
-            return "($code)";
+        $pieces = explode(':', str_replace('n', '$n', $pluralForms));
+        $last = array_pop($pieces);
+        $pluralForms = '';
+        foreach ($pieces as $piece) {
+            $pluralForms .= "$piece:(";
         }
-
-        // note the semicolon. We need that for executing the code.
-        return "$code;";
+        return $pluralForms . $last . str_repeat(')', count($pieces));
     }
 }
