@@ -42,6 +42,8 @@ class ArrayGeneratorTest extends TestCase
         ];
 
         $this->assertSame($expected, $array);
+
+        $this->checkFormatting($expected, $translations);
     }
 
     public function testArrayGeneratorWithEmptyTranslations()
@@ -70,5 +72,35 @@ class ArrayGeneratorTest extends TestCase
         ];
 
         $this->assertSame($expected, $array);
+
+        $this->checkFormatting($expected, $translations, ['includeEmpty' => true]);
+    }
+
+    private function checkFormatting(array $expected, Translations $translations, array $otherOptions = [])
+    {
+        foreach ([
+            [],
+            ['strictTypes' => true],
+            ['pretty' => true],
+            ['strictTypes' => true, 'pretty' => true],
+        ] as $options) {
+            $phpCode = (new ArrayGenerator($options + $otherOptions))->generateString($translations);
+            if (empty($options['strictTypes'])) {
+                $this->assertStringNotContainsString('declare(strict_types=1);', $phpCode);
+            } else {
+                $this->assertStringContainsString('declare(strict_types=1);', $phpCode);
+            }
+            if (empty($options['pretty'])) {
+                $this->assertStringEndsWith(');', $phpCode);
+                $prefix = '<?php ';
+            } else {
+                $this->assertStringEndsWith("];\n", $phpCode);
+                $prefix = "<?php\n";
+            }
+            $this->assertStringStartsWith($prefix, $phpCode);
+            $array = eval(substr($phpCode, strlen($prefix)));
+            $this->assertIsArray($array);
+            $this->assertSame($expected, $array);
+        }
     }
 }
