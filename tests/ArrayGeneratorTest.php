@@ -66,7 +66,7 @@ class ArrayGeneratorTest extends TestCase
             'messages' => [
                 '' => [
                     'Empty translation included' => '',
-                    'Inexistent translation included' => null,
+                    'Inexistent translation included' => '',
                 ],
             ],
         ];
