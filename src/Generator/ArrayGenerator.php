@@ -76,8 +76,10 @@ final class ArrayGenerator extends Generator
             if (self::hasPluralTranslations($translation)) {
                 $messages[$context][$original] = $translation->getPluralTranslations($pluralSize);
                 array_unshift($messages[$context][$original], $translation->getTranslation());
+            } elseif ($pluralSize !== null && $pluralSize > 1 && (string) $translation->getPlural() !== '') {
+                $messages[$context][$original] = array_fill(0, $pluralSize, '');
             } else {
-                $messages[$context][$original] = $translation->getTranslation();
+                $messages[$context][$original] = (string) $translation->getTranslation();
             }
         }
 
