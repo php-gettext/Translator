@@ -83,6 +83,8 @@ class ArrayGeneratorTest extends TestCase
             ['strictTypes' => true],
             ['pretty' => true],
             ['strictTypes' => true, 'pretty' => true],
+            ['strictTypes' => true, 'format' => 'pretty'],
+            ['strictTypes' => true, 'format' => 'compact'],
         ] as $options) {
             $phpCode = (new ArrayGenerator($options + $otherOptions))->generateString($translations);
             if (empty($options['strictTypes'])) {
@@ -90,11 +92,21 @@ class ArrayGeneratorTest extends TestCase
             } else {
                 $this->assertStringContainsString('declare(strict_types=1);', $phpCode);
             }
-            if (empty($options['pretty'])) {
+            if (!empty($options['pretty']) || ($options['format'] ?? '') === 'pretty') {
+                $this->assertStringEndsWith("];\n", $phpCode);
+            } elseif (($options['format'] ?? '') === 'compact') {
+                $this->assertStringEndsWith('];', $phpCode);
+            } else {
                 $this->assertStringEndsWith(');', $phpCode);
+            }
+            if (($options['format'] ?? '') === 'compact') {
+                self::assertStringNotContainsString("\n", $phpCode);
+            } else {
+                self::assertStringContainsString("\n", $phpCode);
+            }
+            if (($options['format'] ?? '') === 'compact' || (empty($options['pretty']) && ($options['format'] ?? '') !== 'pretty')) {
                 $prefix = '<?php ';
             } else {
-                $this->assertStringEndsWith("];\n", $phpCode);
                 $prefix = "<?php\n";
             }
             $this->assertStringStartsWith($prefix, $phpCode);
