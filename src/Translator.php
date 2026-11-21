@@ -209,23 +209,64 @@ class Translator implements TranslatorInterface
     /**
      * This function prepares the gettext plural form expression to be evaluated by PHP
      *
-     * Nested ternary IFs will be enclosed by parenthesis and the variable "n" will be prefixed by "$".
+     * Both branches of every ternary IF will be enclosed by parenthesis (PHP does not
+     * allow nested ternaries without them) and the variable "n" will be prefixed by "$".
      *
-     * $n==1 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2
+     * n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2
      * becomes
-     * $n==1 ? 0 : ($n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2)
+     * $n==1 ?( 0 ):( $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ?( 1 ):( 2))
      */
     private static function fixTerseIfs(string $pluralForms): string
     {
         if (preg_match('/[^<>|%&!?:=n()\d\s]/', $pluralForms)) {
             throw new InvalidArgumentException('Invalid plural form expression');
         }
-        $pieces = explode(':', str_replace('n', '$n', $pluralForms));
-        $last = array_pop($pieces);
-        $pluralForms = '';
-        foreach ($pieces as $piece) {
-            $pluralForms .= "$piece:(";
+        $position = 0;
+        $code = static::parenthesizeTernaries($pluralForms, $position);
+        if ($position !== strlen($pluralForms)) {
+            // parsing stopped early on an unbalanced ")" or ":"
+            throw new InvalidArgumentException('Invalid plural form expression');
         }
-        return $pluralForms . $last . str_repeat(')', count($pieces));
+
+        return str_replace('n', '$n', $code);
+    }
+
+    /**
+     * Reads a C conditional expression starting at $position, and returns it
+     * with both branches of each ternary IF enclosed by parenthesis.
+     * Stops at the end of the expression, or at a ")" or ":" closing an outer level.
+     */
+    private static function parenthesizeTernaries(string $expression, int &$position): string
+    {
+        $length = strlen($expression);
+        $condition = '';
+        while ($position < $length) {
+            $char = $expression[$position];
+            if ($char === ')' || $char === ':') {
+                break;
+            }
+            $position++;
+            if ($char === '(') {
+                $condition .= '(' . static::parenthesizeTernaries($expression, $position);
+                if ($position >= $length || $expression[$position] !== ')') {
+                    throw new InvalidArgumentException('Invalid plural form expression');
+                }
+                $condition .= ')';
+                $position++;
+            } elseif ($char === '?') {
+                $then = static::parenthesizeTernaries($expression, $position);
+                if ($position >= $length || $expression[$position] !== ':') {
+                    throw new InvalidArgumentException('Invalid plural form expression');
+                }
+                $position++;
+                $else = static::parenthesizeTernaries($expression, $position);
+
+                return "$condition?($then):($else)";
+            } else {
+                $condition .= $char;
+            }
+        }
+
+        return $condition;
     }
 }
